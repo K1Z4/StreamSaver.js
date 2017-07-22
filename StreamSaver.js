@@ -7,7 +7,8 @@
 
 	let iframe;
     let loaded;
-	const secure = location.protocol == 'https:' || location.hostname == 'localhost';
+    const secure = location.protocol == 'https:' || location.hostname == 'localhost';
+    if (!secure) console.error("StreamSaver.js requires HTTPS");
      
 	const streamSaver = {
 		createWriteStream,
@@ -42,7 +43,6 @@
 			channel.port1.onmessage = evt => {
 				if(evt.data.download) {
 					resolve()
-					if(!secure) popup.close() // don't need the popup any longer
 					let link = document.createElement('a')
 					let click = new MouseEvent('click')
 
@@ -51,14 +51,14 @@
 				}
 			}
 
-			if (secure && !iframe) {
+			if (!iframe) {
 				iframe = document.createElement('iframe')
 				iframe.src = streamSaver.mitm
 				iframe.hidden = true
 				document.body.appendChild(iframe)
 			}
 
-			if (secure && !loaded) {
+			if (!loaded) {
 				let fn;
 				iframe.addEventListener('load', fn = evt => {
 					loaded = true
@@ -68,23 +68,8 @@
 				})
 			}
 
-			if (secure && loaded) {
+			if (loaded) {
 				iframe.contentWindow.postMessage({filename, size}, '*', [channel.port2])
-			}
-
-			if (!secure) {
-				popup = window.open(streamSaver.mitm, Math.random())
-				let onready = evt => {
-					if(evt.source === popup){
-						popup.postMessage({filename, size}, '*', [channel.port2])
-						removeEventListener('message', onready)
-					}
-				}
-
-				// Another problem that cross origin don't allow is scripting
-				// so popup.onload() don't work but postMessage still dose
-				// work cross origin
-				addEventListener('message', onready)
 			}
 		})
 
