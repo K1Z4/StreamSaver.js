@@ -3,14 +3,15 @@
 	'function' == typeof define && 'object' == typeof define.amd ? define(definition) :
 	this[name] = definition()
 })('streamSaver', () => {
-	'use strict'
+	'use strict';
 
-	let
-	iframe, loaded,
-	secure = location.protocol == 'https:' || location.hostname == 'localhost',
-	streamSaver = {
+	let iframe;
+    let loaded;
+	const secure = location.protocol == 'https:' || location.hostname == 'localhost';
+     
+	const streamSaver = {
 		createWriteStream,
-		supported: false,
+        supported: false,
 		version: {
 			full: '1.0.0',
 			major: 1, minor: 0, dot: 0
@@ -34,8 +35,9 @@
 		if (Number.isFinite(queuingStrategy))
 			[size, queuingStrategy] = [queuingStrategy, size]
 
-		let channel = new MessageChannel,
-		popup,
+        let channel = new MessageChannel;
+        let popup;
+        
 		setupChannel = () => new Promise((resolve, reject) => {
 			channel.port1.onmessage = evt => {
 				if(evt.data.download) {
