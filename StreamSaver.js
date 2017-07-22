@@ -38,7 +38,7 @@
         let channel = new MessageChannel;
         let popup;
         
-		setupChannel = () => new Promise((resolve, reject) => {
+		const setupChannel = () => new Promise((resolve, reject) => {
 			channel.port1.onmessage = evt => {
 				if(evt.data.download) {
 					resolve()
@@ -51,14 +51,14 @@
 				}
 			}
 
-			if(secure && !iframe) {
+			if (secure && !iframe) {
 				iframe = document.createElement('iframe')
 				iframe.src = streamSaver.mitm
 				iframe.hidden = true
 				document.body.appendChild(iframe)
 			}
 
-			if(secure && !loaded) {
+			if (secure && !loaded) {
 				let fn;
 				iframe.addEventListener('load', fn = evt => {
 					loaded = true
@@ -68,11 +68,11 @@
 				})
 			}
 
-			if(secure && loaded) {
+			if (secure && loaded) {
 				iframe.contentWindow.postMessage({filename, size}, '*', [channel.port2])
 			}
 
-			if(!secure) {
+			if (!secure) {
 				popup = window.open(streamSaver.mitm, Math.random())
 				let onready = evt => {
 					if(evt.source === popup){
