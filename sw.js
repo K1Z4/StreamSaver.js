@@ -77,7 +77,7 @@ self.onfetch = event => {
 
 	// Make filename RFC5987 compatible
 	filename = encodeURIComponent(filename)
-		.replace(/['()]/g, escape)
+		.replace(/['()]/g, "")
 		.replace(/\*/g, '%2A')
 
 	headers = {
