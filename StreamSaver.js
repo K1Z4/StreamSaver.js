@@ -1,77 +1,53 @@
-;((name, definition) => {
-	'undefined' != typeof module ? module.exports = definition() :
-	'function' == typeof define && 'object' == typeof define.amd ? define(definition) :
-	this[name] = definition()
-})('streamSaver', () => {
-	'use strict';
+"use strict";
+class StreamSaver {
+    constructor(mitmUrl) {
+        if (location.protocol !== 'https:' && location.hostname !== 'localhost') return console.error("StreamSaver.js requires HTTPS");
 
-	let iframe;
-    let loaded;
-    const secure = location.protocol == 'https:' || location.hostname == 'localhost';
-    if (!secure) console.error("StreamSaver.js requires HTTPS");
-     
-	const streamSaver = {
-		createWriteStream,
-        supported: false,
-		version: {
-			full: '1.0.0',
-			major: 1, minor: 0, dot: 0
-		}
-	}
+        this.supported = false;
+        this.mitm = mitmUrl;
 
-	streamSaver.mitm = 'https://jimmywarting.github.io/StreamSaver.js/mitm.html?version=' +
-		streamSaver.version.full
+       	try {
+            // Some browsers have streams but doesn't support constructing yet
+            this.supported = 'serviceWorker' in navigator && !!new ReadableStream() && !!new WritableStream()
+        } catch(err) {}
+        
+        if (!this.supported) return console.log("Browser does not support required classes, exiting initialisation");
 
-	try {
-		// Some browser has it but ain't allowed to construct a stream yet
-		streamSaver.supported = 'serviceWorker' in navigator && !!new ReadableStream() && !!new WritableStream()
-	} catch(err) {
-		// if you are running chrome < 52 then you can enable it
-		// `chrome://flags/#enable-experimental-web-platform-features`
-	}
+        this.iframe = document.createElement('iframe');
+        this.iframe.src = this.mitm;
+		this.iframe.hidden = true;
+        document.body.appendChild(this.iframe);
+    }
 
-	function createWriteStream(filename, queuingStrategy, size) {
-
+    createWriteStream(filename, queuingStrategy, size) {
 		// normalize arguments
 		if (Number.isFinite(queuingStrategy))
 			[size, queuingStrategy] = [queuingStrategy, size]
 
-        let channel = new MessageChannel;
-        let popup;
+        const channel = new MessageChannel;
         
 		const setupChannel = () => new Promise((resolve, reject) => {
 			channel.port1.onmessage = evt => {
 				if(evt.data.download) {
 					resolve()
-					let link = document.createElement('a')
-					let click = new MouseEvent('click')
-
-					link.href = evt.data.download
-					link.dispatchEvent(click)
+                    const link = document.createElement('a');
+					link.href = evt.data.download;
+					link.dispatchEvent(new MouseEvent('click'));
 				}
 			}
 
-			if (!iframe) {
-				iframe = document.createElement('iframe')
-				iframe.src = streamSaver.mitm
-				iframe.hidden = true
-				document.body.appendChild(iframe)
-			}
+			if (this.iframe.readyState  !== 'complete') {
+				const fn = () => {
+                    this.iframe.removeEventListener('load', fn);
+                    this.iframe.contentWindow.postMessage({filename, size}, '*', [channel.port2])
+                }
+                
+                this.iframe.addEventListener('load', fn);
+			} else {
+				this.iframe.contentWindow.postMessage({filename, size}, '*', [channel.port2])
 
-			if (!loaded) {
-				let fn;
-				iframe.addEventListener('load', fn = evt => {
-					loaded = true
-					iframe.removeEventListener('load', fn)
-					iframe.contentWindow.postMessage(
-						{filename, size}, '*', [channel.port2])
-				})
-			}
-
-			if (loaded) {
-				iframe.contentWindow.postMessage({filename, size}, '*', [channel.port2])
-			}
-		})
+            }
+		});
 
 		return new WritableStream({
 			start(error) {
@@ -102,6 +78,4 @@
 			}
 		}, queuingStrategy)
 	}
-
-	return streamSaver
-})
+}
