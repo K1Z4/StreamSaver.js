@@ -23,7 +23,6 @@ const supported = StreamSaver.supported;
 const streamSaver = new StreamSaver();
 const stream = streamSaver.createStream("filename.txt", fileSize);
 const writer = stream.getWriter();
-const writer = StreamSaver.createStream("filename.txt", fileSize);
 
 writer.write(uint8array);
 // or
