@@ -15,12 +15,16 @@ We then fulfill the request with a [ReadableStream][2].
 
 Examples
 ==================
+Check out the examples folder for a working example.
 ```javascript
-// TODO update me
 //Check support
 const supported = StreamSaver.supported;
 
+const streamSaver = new StreamSaver();
+const stream = streamSaver.createStream("filename.txt", fileSize);
+const writer = stream.getWriter();
 const writer = StreamSaver.createStream("filename.txt", fileSize);
+
 writer.write(uint8array);
 // or
 writer.write(arrayBuffer);
