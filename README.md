@@ -20,8 +20,9 @@ Check out the examples folder for a working example.
 //Check support
 const supported = StreamSaver.supported;
 
-const streamSaver = new StreamSaver();
-const stream = streamSaver.createStream("filename.txt", fileSize);
+// All params optional
+const streamSaver = new StreamSaver({ scope: "src/downloads", serviceWorkerPath: "src/StreamSaverServiceWorker.js" });
+const stream = streamSaver.createStream({ name: "helloWorld.txt", size: 100, contentType: "application/text"  });
 const writer = stream.getWriter();
 
 writer.write(uint8array);
