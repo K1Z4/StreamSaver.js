@@ -16,7 +16,7 @@ gulp.task('js', function() {
         .on('error', onError)
         .pipe(uglify())
         .on('error', onError)
-        .pipe(sourcemaps.write())
+        //.pipe(sourcemaps.write())
         .on('error', onError)
         .pipe(gulp.dest('dist'));
 });
