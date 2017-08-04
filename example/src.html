@@ -1,0 +1,33 @@
+<html>
+<body>
+    <h1>StreamSaver Example</h1>
+    <p>If the example works you should have downloaded a file called helloWorld.txt containing the text Hello World</p>
+    <script src="src/StreamSaver.js"></script>
+    <script>
+        "use strict";
+
+
+        const dataToSend = "Hello World";
+        const blob = new Blob([dataToSend], { type : 'application/text' });
+
+        const streamSaver = new StreamSaver({ scope: "src/downloads", serviceWorkerPath: "src/StreamSaverServiceWorker.js" });
+        const stream = streamSaver.createStream({ name: "helloWorld.txt", size: blob.size });
+        const writer = stream.getWriter();
+
+
+
+        const fileReader = new FileReader();
+        fileReader.onload = function() {
+            const arrayBuffer = this.result;
+            const uint8 = new Uint8Array(arrayBuffer);
+
+            writer.write(uint8);
+            writer.close();
+        };
+
+        fileReader.readAsArrayBuffer(blob);
+
+
+    </script>
+</body>
+</html>

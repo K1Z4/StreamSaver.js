@@ -6,7 +6,8 @@ const port = process.env.PORT || 80; // PORT=8080 node webServerOnly.js
 
 const app = express();
 app.disable('x-powered-by');
-app.use(express.static(path.join(__dirname.replace("example", "src"))));
+app.use("/src", express.static(path.join(__dirname.replace("example", "src"))));
+app.use("/dist", express.static(path.join(__dirname.replace("example", "dist"))));
 app.use(express.static(__dirname));
 
 app.get('*', function(req, res) {
@@ -18,5 +19,10 @@ app.use(function(err, req, res, next) {
 	res.status(500).send('500 ERR');
 });
 
-app.listen(port);
-console.log("Running")
+app.listen(port).on("error", (err) => {
+	const fallbackPort = 8080;
+	console.warn(`Could not launch on port ${port}, falling back to port ${fallbackPort}`);
+	app.listen(fallbackPort);
+});
+
+

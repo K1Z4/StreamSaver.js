@@ -1,32 +1,9 @@
 <html>
 <body>
-    StreamSaver Example<br>
-    <script src="/StreamSaver.js"></script>
-    <script>
-        "use strict";
+    <p>StreamSaver Example</p>
 
-
-        const dataToSend = "hello world";
-        const blob = new Blob([dataToSend], { type : 'application/text' });
-
-        const streamSaver = new StreamSaver();
-        const stream = streamSaver.createStream("download.txt", blob.size);
-        const writer = stream.getWriter();
-
-
-
-        const fileReader = new FileReader();
-        fileReader.onload = function() {
-            const arrayBuffer = this.result;
-            const uint8 = new Uint8Array(arrayBuffer);
-
-            writer.write(uint8);
-            writer.close();
-        };
-
-        fileReader.readAsArrayBuffer(blob);
-
-
-    </script>
+    <p>Use StreamSaver.js from folder:</p>
+    <p><a href="/dist.html">dist</a></p>
+    <p><a href="/src.html">src</a></p>
 </body>
 </html>
