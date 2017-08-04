@@ -39,11 +39,13 @@ Browser Support
 | ---------- | --------- | ----------------------- |
 | Opera 39+  | Yes       |                         |
 | Chrome 52+ | Yes       |                         |
-| Firefox    | No        | Streams                 |
+| Firefox    | No        | [Streams][4]            |
 | Safari     | No        | SW                      |
-| Edge       | No        | Streams, SW             |
+| Edge       | No        | [Streams][5], SW        |
 | IE         | No        | Everything (IE is dead) |
 
 [1]: https://github.com/jimmywarting
 [2]: https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream
 [3]: https://developer.mozilla.org/en/docs/Web/API/Service_Worker_API
+[4]: https://platform-status.mozilla.org/#streams
+[5]: https://developer.microsoft.com/en-us/microsoft-edge/platform/status/streamsapi/
