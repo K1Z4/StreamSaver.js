@@ -8,7 +8,7 @@ this.addEventListener('fetch', (event) => {
     const downloadData = downloads[url];
 	if (!downloadData) return null;
 
-    const filename = downloadData.fileInfo.name;
+    const filename = encodeRFC5987(downloadData.fileInfo.name);
 	const headers = {
 		'Content-Disposition': "attachment; filename*=UTF-8''" + filename
 	}
@@ -31,7 +31,6 @@ self.onmessage = event => {
 	const downloadUrl = generateDownloadUrl(fileInfo.name);
 	const stream = new ReadableStream({
 		start(controller) {
-			console.log("writer starting, controller:", controller);
 			messagePort.onmessage = ({data}) => {
 				if (data instanceof ArrayBuffer) {
 					const unitArray = new Uint8Array(data);
@@ -63,5 +62,11 @@ self.onmessage = event => {
 }
 
 function generateDownloadUrl(fileName) {
-	return self.registration.scope + "/" + fileName;
+	return encodeURI(self.registration.scope + "/" + fileName);
+}
+
+function encodeRFC5987(str) {
+    return encodeURIComponent(str)
+        .replace(/['()]/g, match => '%' + match.charCodeAt(0).toString(16))
+		.replace(/\*/g, '%2A')
 }
