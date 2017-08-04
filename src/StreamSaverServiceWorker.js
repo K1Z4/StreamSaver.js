@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 let downloads = {};
 
@@ -6,17 +6,15 @@ this.addEventListener('fetch', (event) => {
 	const url = event.request.url;
 
     const downloadData = downloads[url];
-	if (!downloadData) console.log("no url matches");
 	if (!downloadData) return null;
 
-    const filename = downloadData.fileInfo.fileName;
+    const filename = downloadData.fileInfo.name;
 	const headers = {
-		//'Content-Type': contentType || 'application/octet-stream; charset=utf-8',
 		'Content-Disposition': "attachment; filename*=UTF-8''" + filename
 	}
-	console.log("headers:", headers);
+	
 	if (downloadData.fileInfo.contentType) headers['Content-Type'] = downloadData.fileInfo.contentType;
-	if (downloadData.fileInfo.fileSize) headers['Content-Length'] = downloadData.fileInfo.fileSize;
+	if (downloadData.fileInfo.size) headers['Content-Length'] = downloadData.fileInfo.size;
 
 	event.respondWith(new Response(downloadData.stream, { headers }));
 
@@ -30,7 +28,7 @@ self.onmessage = event => {
 		
 	const messagePort = event.ports[0];
 	const fileInfo = JSON.parse(event.data);
-	const downloadUrl = generateDownloadUrl(fileInfo.fileName);
+	const downloadUrl = generateDownloadUrl(fileInfo.name);
 	const stream = new ReadableStream({
 		start(controller) {
 			console.log("writer starting, controller:", controller);

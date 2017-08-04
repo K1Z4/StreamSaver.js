@@ -6,7 +6,7 @@
     "use strict";
 
     return class StreamSaver {
-        constructor(scope = "./StreamSaverDownloads") {
+        constructor({ scope = "./StreamSaverDownloads", serviceWorkerPath = "StreamSaverServiceWorker.js" } = {}) {
             if (location.protocol !== 'https:' && location.hostname !== 'localhost') 
                 throw Error("StreamSaver.js needs to be served via HTTPS or on localhost");
 
@@ -15,18 +15,8 @@
             this._onServiceWorkerPromises = [];
 
             navigator.serviceWorker.getRegistration(scope).then(reg => {
-                return reg || navigator.serviceWorker.register('StreamSaverServiceWorker.js', {scope: scope});
+                return reg || navigator.serviceWorker.register(serviceWorkerPath, {scope});
             }).then(swReg => {
-
-                // Only for debugging
-                if(swReg.installing) {
-                    console.log('Service worker installing');
-                } else if(swReg.waiting) {
-                    console.log('Service worker installed');
-                } else if(swReg.active) {
-                    console.log('Service worker active');
-                }
-
                 const worker = swReg.installing || swReg.waiting || swReg.active;
 
                 this._serviceWorker = worker;
@@ -55,7 +45,9 @@
             });
         }
 
-        createStream(fileName, fileSize, contentType, queuingStrategy) {
+        createStream(fileOptions, queuingStrategy) {
+            // TODO: Add overload?
+
             const channel = new MessageChannel;
             const self = this;
             return new WritableStream({
@@ -67,7 +59,7 @@
                             channel.port1.onmessage = evt => {
                                 if (!evt.data) return reject("Service worker did not provide download url");
 
-                                // If we added a download attribute to the link the download fails on Chrome. Not sure why.
+                                // If we add a download attribute to the link the download fails on Chrome. Not sure why.
                                 const link = document.createElement('a');
                                 link.href = evt.data;
                                 link.dispatchEvent(new MouseEvent('click'));
@@ -75,8 +67,8 @@
                                 return resolve();
                             }
 
-                            // Stringify the data before sending due to improved performance
-                            worker.postMessage(JSON.stringify({ fileName, fileSize, contentType }), [channel.port2]);
+                            // Stringify the data before sending for slightly improved performance
+                            worker.postMessage(JSON.stringify(fileOptions), [channel.port2]);
                         });
                     });
                 },
