@@ -40,8 +40,8 @@ Browser Support
 | Opera 39+  | Yes       |                         |
 | Chrome 52+ | Yes       |                         |
 | Firefox    | No        | [Streams][4]            |
-| Safari     | No        | SW                      |
-| Edge       | No        | [Streams][5], SW        |
+| Safari     | No        | Service Worker          |
+| Edge       | No        | [Streams][5], Service Worker |
 | IE         | No        | Everything (IE is dead) |
 
 [1]: https://github.com/jimmywarting
